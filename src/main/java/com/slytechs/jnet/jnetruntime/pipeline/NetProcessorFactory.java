@@ -24,6 +24,6 @@ package com.slytechs.jnet.jnetruntime.pipeline;
  */
 public interface NetProcessorFactory<T extends NetProcessor<T>> {
 
-	T newInstance(NetPipeline pipeline, int priority);
+	T newInstance(NetProcessorGroup group, int priority);
 	
 }

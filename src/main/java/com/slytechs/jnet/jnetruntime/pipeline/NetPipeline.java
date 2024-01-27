@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -31,192 +32,19 @@ import java.util.stream.StreamSupport;
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
  */
-public class NetPipeline implements AutoCloseable, Iterable<NetProcessor<?>> {
+public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Iterable<NetProcessor<?>> {
 
-	/**
-	 * The Class Group.
-	 *
-	 * @author Sly Technologies Inc
-	 * @author repos@slytechs.com
-	 */
-	static class Group extends AbstractNetProcessor<Group> {
+	NetPipeline(NetProcessorType type) {
+		super(null, type);
+	}
 
-		/**
-		 * The Class Empty.
-		 */
-		private static class Empty extends Group {
-
-			/** The Constant EMPTY. */
-			private final static NetProcessor<?>[] EMPTY = new NetProcessor[0];
-
-			/**
-			 * Instantiates a new empty.
-			 *
-			 * @param pipeline the pipeline
-			 * @param type     the type
-			 */
-			protected Empty(NetPipeline pipeline, NetProcessorType type) {
-				super(pipeline, type);
-			}
-
-			/**
-			 * Checks if is empty.
-			 *
-			 * @return true, if is empty
-			 * @see com.slytechs.jnet.protocol.NetProcessorGroup#isEmpty()
-			 */
-			@Override
-			public boolean isEmpty() {
-				return true;
-			}
-
-			/**
-			 * Processors.
-			 *
-			 * @return the net processor[]
-			 * @see com.slytechs.jnet.protocol.NetProcessorGroup#processors()
-			 */
-			@Override
-			public NetProcessor<?>[] processors() {
-				return EMPTY;
-			}
-
-			/**
-			 * Source.
-			 *
-			 * @return the object
-			 * @see com.slytechs.jnet.protocol.NetProcessorGroup#source()
-			 */
-			@Override
-			public Object source() {
-				throw new IllegalStateException("no processors in group");
-			}
-
-			/**
-			 * To array.
-			 *
-			 * @return the net processor[]
-			 * @see com.slytechs.jnet.protocol.NetProcessorGroup#toArray()
-			 */
-			@Override
-			public NetProcessor<?>[] toArray() {
-				return EMPTY;
-			}
-
-		}
-
-		/**
-		 * Empty.
-		 *
-		 * @param pipeline the pipeline
-		 * @param type     the type
-		 * @return the group
-		 */
-		public static final Group empty(NetPipeline pipeline, NetProcessorType type) {
-			return new Empty(pipeline, type);
-		}
-
-		/**
-		 * Of type.
-		 *
-		 * @param pipeline the pipeline
-		 * @param type     the type
-		 * @return the group
-		 */
-		public static final Group ofType(NetPipeline pipeline, NetProcessorType type) {
-			boolean empty = pipeline.stream(type)
-					.anyMatch(NetProcessor::isEnabled);
-
-			if (empty)
-				return empty(pipeline, type);
-			else
-				return new Group(pipeline, type);
-		}
-
-		/** The processors. */
-		private final NetProcessor<?>[] processors;
-
-		/**
-		 * Instantiates a new group.
-		 *
-		 * @param pipeline the pipeline
-		 * @param type     the type
-		 */
-		private Group(NetPipeline pipeline, NetProcessorType type) {
-			super(pipeline, type.id(), type);
-
-			this.processors = toArray();
-		}
-
-		/**
-		 * Dispose.
-		 *
-		 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#dispose()
-		 */
-		@Override
-		public void dispose() {
-			for (var p : processors)
-				p.dispose();
-		}
-
-		/**
-		 * Checks if is empty.
-		 *
-		 * @return true, if is empty
-		 */
-		public boolean isEmpty() {
-			return processors.length == 0;
-		}
-
-		/**
-		 * Processors.
-		 *
-		 * @return the net processor[]
-		 */
-		public NetProcessor<?>[] processors() {
-			return this.processors;
-		}
-
-		/**
-		 * Setup.
-		 *
-		 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#setup()
-		 */
-		@Override
-		public void setup() {
-			for (var p : processors)
-				p.setup();
-		}
-
-		/**
-		 * Source.
-		 *
-		 * @return the object
-		 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#source()
-		 */
-		@Override
-		public Object source() {
-			return processors[0].source();
-		}
-
-		/**
-		 * To array.
-		 *
-		 * @return the net processor[]
-		 */
-		public NetProcessor<?>[] toArray() {
-			NetProcessor<?>[] array = pipeline().stream(type())
-					.filter(NetProcessor::isEnabled)
-					.sorted()
-					.toArray(NetProcessor[]::new);
-
-			return array;
-		}
-
+	NetPipeline(NetProcessorGroup parent, NetProcessorType type) {
+		super(parent, type);
 	}
 
 	/** The groups. */
-	private Group[] groups;
+	private NetProcessorGroup[] groups;
+	private List<NetProcessorGroup> groupList = NetProcessorGroup.all(this);
 
 	/** The all processors. */
 	private final List<NetProcessor<?>> allProcessors = new ArrayList<>();
@@ -229,16 +57,9 @@ public class NetPipeline implements AutoCloseable, Iterable<NetProcessor<?>> {
 	private void build() {
 		checkNotBuiltStatus();
 
-		var list = new ArrayList<Group>();
-
-		for (var t : NetProcessorType.values()) {
-			Group g = Group.ofType(this, t);
-
-			if (!g.isEmpty())
-				list.add(g);
-		}
-
-		this.groups = list.toArray(Group[]::new);
+		this.groups = groupList.stream()
+				.filter(Predicate.not(NetProcessorGroup::isEmpty))
+				.toArray(NetProcessorGroup[]::new);
 		Arrays.sort(groups);
 	}
 
@@ -381,6 +202,19 @@ public class NetPipeline implements AutoCloseable, Iterable<NetProcessor<?>> {
 		allProcessors.clear();
 
 		return this;
+	}
+
+	@Override
+	public NetPipeline pipeline() {
+		return this;
+	}
+
+	@Override
+	NetProcessorGroup resolveByType(NetProcessorType type) {
+		return groupList.stream()
+				.filter(g -> g.type() == type)
+				.findAny()
+				.orElseThrow();
 	}
 
 }

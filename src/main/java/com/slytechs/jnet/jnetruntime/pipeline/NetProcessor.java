@@ -50,9 +50,13 @@ public interface NetProcessor<T extends NetProcessor<T>> extends Comparable<NetP
 	
 	GroupType type();
 	
-	Object source();
+	Object sink();
 	
 	void setup();
 	
 	void dispose();
+	
+	void link(NetProcessor<?> next);
+	
+	NetProcessorGroup group();
 }

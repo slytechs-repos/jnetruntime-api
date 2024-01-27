@@ -27,16 +27,23 @@ import java.util.function.BooleanSupplier;
 public abstract class AbstractNetProcessor<T extends NetProcessor<T>> implements NetProcessor<T> {
 
 	private final int priority;
-	private final NetPipeline pipeline;
 	private final NetProcessorType type;
 	
 	private String name;
 	private BooleanSupplier enabled = () -> true;
+	private final NetProcessorGroup group;
 
-	protected AbstractNetProcessor(NetPipeline pipeline, int priority, NetProcessorType classifier) {
-		this.pipeline = pipeline;
+	AbstractNetProcessor(int priority, NetProcessorType classifier) {
+		this.group = null;
 		this.priority = priority;
 		this.type = classifier;
+		this.name = getClass().getSimpleName();
+	}
+
+	protected AbstractNetProcessor(NetProcessorGroup group, int priority, NetProcessorType type) {
+		this.group = Objects.requireNonNull(group, "group").resolveByType(type);
+		this.priority = priority;
+		this.type = type;
 		this.name = getClass().getSimpleName();
 	}
 
@@ -107,11 +114,16 @@ public abstract class AbstractNetProcessor<T extends NetProcessor<T>> implements
 	 */
 	@Override
 	public NetPipeline apply() {
-		return pipeline;
+		return pipeline();
 	}
 	
 	public NetPipeline pipeline() {
-		return pipeline;
+		return group.pipeline();
+	}
+
+	@Override
+	public NetProcessorGroup group() {
+		return group;
 	}
 
 }
