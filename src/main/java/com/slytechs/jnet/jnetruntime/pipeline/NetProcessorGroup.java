@@ -131,6 +131,9 @@ public class NetProcessorGroup extends AbstractNetProcessor<NetProcessorGroup> {
 	public void dispose() {
 		for (var p : processors)
 			p.dispose();
+		
+		processors = null;
+		parent = null;
 	}
 
 	/**
@@ -194,7 +197,7 @@ public class NetProcessorGroup extends AbstractNetProcessor<NetProcessorGroup> {
 		return last;
 	}
 
-	private void linkGroup() {
+	 void linkGroup() {
 		for (int i = processors.length - 2; i >= 0; i--) {
 			var next = processors[i + 1];
 			var curr = processors[i + 0];

@@ -17,6 +17,7 @@ package com.slytechs.jnet.jnetruntime.pipeline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
@@ -34,8 +35,8 @@ import java.util.stream.StreamSupport;
  */
 public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Iterable<NetProcessor<?>> {
 
-	NetPipeline(NetProcessorType type) {
-		super(null, type);
+	public NetPipeline(NetProcessorType type) {
+		super(type);
 	}
 
 	NetPipeline(NetProcessorGroup parent, NetProcessorType type) {
@@ -43,8 +44,7 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	}
 
 	/** The groups. */
-	private NetProcessorGroup[] groups;
-	private List<NetProcessorGroup> groupList = NetProcessorGroup.all(this);
+	private List<NetProcessorGroup> groupList = new ArrayList<>();
 
 	/** The all processors. */
 	private final List<NetProcessor<?>> allProcessors = new ArrayList<>();
@@ -56,18 +56,19 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 */
 	private void build() {
 		checkNotBuiltStatus();
+		
+		Collections.sort(groupList);
+		
+		groupList.forEach(NetProcessorGroup::linkGroup);
+		groupList.forEach(NetProcessorGroup::setup);
 
-		this.groups = groupList.stream()
-				.filter(Predicate.not(NetProcessorGroup::isEmpty))
-				.toArray(NetProcessorGroup[]::new);
-		Arrays.sort(groups);
 	}
 
 	/**
 	 * Check not built.
 	 */
 	private void checkNotBuiltStatus() {
-		if (groups != null)
+		if (!groupList.isEmpty())
 			throw new IllegalStateException("pipeline already built");
 	}
 
@@ -214,7 +215,12 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 		return groupList.stream()
 				.filter(g -> g.type() == type)
 				.findAny()
-				.orElseThrow();
+				.orElseGet(() -> {
+					var g = new NetProcessorGroup(this, type);
+
+					groupList.add(g);
+					return g;
+				});
 	}
 
 }

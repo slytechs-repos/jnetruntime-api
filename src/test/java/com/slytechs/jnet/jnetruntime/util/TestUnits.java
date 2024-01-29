@@ -23,9 +23,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.slytechs.jnet.jnetruntime.util.CountUnit;
-import com.slytechs.jnet.jnetruntime.util.UnitUtils;
-
 /**
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
