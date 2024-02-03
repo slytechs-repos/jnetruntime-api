@@ -31,8 +31,8 @@ import com.slytechs.jnet.jnetruntime.util.Registration;
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
  */
-public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, T_OUT>
-		implements Comparable<NetProcessor<?, ?, ?>> {
+public abstract class Processor<T_US extends Processor<T_US, T_IN, T_OUT>, T_IN, T_OUT>
+		implements Comparable<Processor<?, ?, ?>> {
 
 	/**
 	 * Compare to.
@@ -42,7 +42,7 @@ public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>,
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(NetProcessor<?, ?, ?> o) {
+	public int compareTo(Processor<?, ?, ?> o) {
 		return priority() - o.priority();
 	}
 
@@ -50,7 +50,7 @@ public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>,
 	private final DataType outputType;
 	private final DataType inputType;
 	private final List<T_OUT> outputList = new ArrayList<>();
-	private final List<NetProcessor<?, T_OUT, T_OUT>> outputProcessorList = new ArrayList<>();
+	private final List<Processor<?, T_OUT, T_OUT>> outputProcessorList = new ArrayList<>();
 	private final T_IN input;
 
 	private String name;
@@ -59,7 +59,7 @@ public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>,
 	protected T_OUT output;
 
 	@SuppressWarnings("unchecked")
-	public NetProcessor(int priority, DataType inputType, DataType outputType) {
+	public Processor(int priority, DataType inputType, DataType outputType) {
 		this.priority = priority;
 		this.outputType = outputType;
 		this.inputType = inputType;
@@ -79,7 +79,7 @@ public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>,
 		};
 	}
 
-	public Registration addOutput(T_OUT out, NetProcessor<?, T_OUT, T_OUT> processor) {
+	public Registration addOutput(T_OUT out, Processor<?, T_OUT, T_OUT> processor) {
 		outputProcessorList.add(processor);
 
 		/*
@@ -197,7 +197,7 @@ public abstract class NetProcessor<T_US extends NetProcessor<T_US, T_IN, T_OUT>,
 		return (T_US) this;
 	}
 
-	public abstract void setup(NetProcessorContext context);
+	public abstract void setup(ProcessorContext context);
 
 	public abstract void onLink(ProcessorLink<T_IN> link);
 

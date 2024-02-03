@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * The Class NetProcessorContext.
  */
-public final class NetProcessorContext {
+public final class ProcessorContext {
 
 	/**
 	 * The Class Key.
@@ -93,8 +93,8 @@ public final class NetProcessorContext {
 		 *
 		 * @return the enclosing instance
 		 */
-		private NetProcessorContext getEnclosingInstance() {
-			return NetProcessorContext.this;
+		private ProcessorContext getEnclosingInstance() {
+			return ProcessorContext.this;
 		}
 
 	}
@@ -103,12 +103,12 @@ public final class NetProcessorContext {
 	private final Map<Key<?>, Object> map = new HashMap<>();
 
 	/** The parent. */
-	private final NetProcessorContext parent;
+	private final ProcessorContext parent;
 
 	/**
 	 * Instantiates a new net processor context.
 	 */
-	public NetProcessorContext() {
+	public ProcessorContext() {
 		this.parent = null;
 	}
 
@@ -117,7 +117,7 @@ public final class NetProcessorContext {
 	 *
 	 * @param parent the parent
 	 */
-	public NetProcessorContext(NetProcessorContext parent) {
+	public ProcessorContext(ProcessorContext parent) {
 		this.parent = parent;
 
 		property("parent", parent);
@@ -194,7 +194,7 @@ public final class NetProcessorContext {
 	 * @param value the value
 	 * @return the net processor context
 	 */
-	public <T> NetProcessorContext property(T value) {
+	public <T> ProcessorContext property(T value) {
 		return property("", value);
 	}
 
@@ -207,7 +207,7 @@ public final class NetProcessorContext {
 	 * @return the net processor context
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized <T> NetProcessorContext property(String name, T value) {
+	public synchronized <T> ProcessorContext property(String name, T value) {
 		Key<T> key = new Key<T>(name, (Class<T>) value.getClass());
 
 		map.put(key, value);

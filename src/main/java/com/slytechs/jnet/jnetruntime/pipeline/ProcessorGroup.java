@@ -27,8 +27,8 @@ import com.slytechs.jnet.jnetruntime.util.Registration;
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
  */
-public class ProcessorGroup<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, T_OUT> extends
-		NetProcessor<T_US, T_IN, T_OUT> {
+public class ProcessorGroup<T_US extends Processor<T_US, T_IN, T_OUT>, T_IN, T_OUT> extends
+		Processor<T_US, T_IN, T_OUT> {
 
 	/** The processors. */
 	private final List<UnaryProcessor<?, T_OUT>> processors = new ArrayList<>();
@@ -46,13 +46,13 @@ public class ProcessorGroup<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, 
 	/**
 	 * Dispose.
 	 *
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#destroy()
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#destroy()
 	 */
 	@Override
 	public void destroy() {
 		super.destroy();
 
-		processors.forEach(NetProcessor::destroy);
+		processors.forEach(Processor::destroy);
 		Collections.fill(processors, null); // Destroy
 		processors.clear();
 	}
@@ -71,14 +71,14 @@ public class ProcessorGroup<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, 
 	 *
 	 * @return the net processor[]
 	 */
-	public NetProcessor<?, ?, ?>[] processors() {
-		return this.processors.toArray(NetProcessor[]::new);
+	public Processor<?, ?, ?>[] processors() {
+		return this.processors.toArray(Processor[]::new);
 	}
 
 	/**
 	 * Add to the last processor in this group, output
 	 * 
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#addOutput(java.lang.Object)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#addOutput(java.lang.Object)
 	 */
 	@Override
 	public Registration addOutput(T_OUT out) {
@@ -99,8 +99,8 @@ public class ProcessorGroup<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, 
 		list.add(reg);
 
 		for (int i = 0; i < processors.size() - 1; i++) {
-			NetProcessor<?, T_OUT, T_OUT> prev = processors.get(i + 0);
-			NetProcessor<?, T_OUT, T_OUT> next = processors.get(i + 1);
+			Processor<?, T_OUT, T_OUT> prev = processors.get(i + 0);
+			Processor<?, T_OUT, T_OUT> next = processors.get(i + 1);
 
 			reg = prev.addOutput(next.input(), next);
 			list.add(reg);
@@ -110,22 +110,22 @@ public class ProcessorGroup<T_US extends NetProcessor<T_US, T_IN, T_OUT>, T_IN, 
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#setup(com.slytechs.jnet.jnetruntime.pipeline.NetProcessor.NetProcessorContext)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#setup(com.slytechs.jnet.jnetruntime.pipeline.Processor.ProcessorContext)
 	 */
 	@Override
-	public void setup(NetProcessorContext context) {
+	public void setup(ProcessorContext context) {
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onLink(ProcessorLink<T_IN> link) {
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onUnlink(ProcessorLink<T_IN> link) {

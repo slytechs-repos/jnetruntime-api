@@ -36,24 +36,24 @@ import com.slytechs.jnet.jnetruntime.pipeline.ProcessorFactory.PipelineFactory;
  * @param <T_IN>  the generic type
  * @param <T_OUT> the generic type
  */
-public class NetPipeline<T_IN, T_OUT>
-		extends NetProcessor<NetPipeline<T_IN, T_OUT>, T_IN, T_OUT>
-		implements AutoCloseable, Iterable<NetProcessor<?, ?, ?>> {
+public class Pipeline<T_IN, T_OUT>
+		extends Processor<Pipeline<T_IN, T_OUT>, T_IN, T_OUT>
+		implements AutoCloseable, Iterable<Processor<?, ?, ?>> {
 
 	/** The pipeline list. */
-	private final List<NetPipeline<?, ?>> pipelineList = new ArrayList<>();
+	private final List<Pipeline<?, ?>> pipelineList = new ArrayList<>();
 
 	/** The groups. */
 	private final List<ProcessorGroup<?, ?, ?>> groupList = new ArrayList<>();
 
 	/** The all processors. */
-	private final List<NetProcessor<?, ?, ?>> processorList = new ArrayList<>();
+	private final List<Processor<?, ?, ?>> processorList = new ArrayList<>();
 
 	/** The closed. */
 	private boolean closed;
 
 	/** The context. */
-	private final NetProcessorContext context;
+	private final ProcessorContext context;
 
 	/** The highest priority. */
 	private int highestPriority = 0;
@@ -65,9 +65,9 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param inputType  the input type
 	 * @param outputType the output type
 	 */
-	protected NetPipeline(int priority, DataType inputType, DataType outputType) {
+	protected Pipeline(int priority, DataType inputType, DataType outputType) {
 		super(priority, inputType, outputType);
-		this.context = new NetProcessorContext();
+		this.context = new ProcessorContext();
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 *
 	 * @return the net processor context
 	 */
-	public final NetProcessorContext context() {
+	public final ProcessorContext context() {
 		return context;
 	}
 
@@ -117,7 +117,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param b the b
 	 * @return the net pipeline
 	 */
-	public NetPipeline<T_IN, T_OUT> enableAll(boolean b) {
+	public Pipeline<T_IN, T_OUT> enableAll(boolean b) {
 		checkNotBuiltStatus();
 
 		return enableAll(() -> b);
@@ -129,7 +129,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param b the b
 	 * @return the net pipeline
 	 */
-	public NetPipeline<T_IN, T_OUT> enableAll(BooleanSupplier b) {
+	public Pipeline<T_IN, T_OUT> enableAll(BooleanSupplier b) {
 		checkNotBuiltStatus();
 
 		for (var p : this)
@@ -148,7 +148,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param factory  the factory
 	 * @return the t
 	 */
-	public <T extends NetProcessor<T, T1, T2>, T1, T2> T install(int priority, ProcessorFactory<T, T1, T2> factory) {
+	public <T extends Processor<T, T1, T2>, T1, T2> T install(int priority, ProcessorFactory<T, T1, T2> factory) {
 		checkNotBuiltStatus();
 
 		T processor = factory.newInstance(priority);
@@ -165,7 +165,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param factory the factory
 	 * @return the t
 	 */
-	public <T extends NetProcessor<T, T1, T2>, T1, T2> T install(ProcessorFactory<T, T1, T2> factory) {
+	public <T extends Processor<T, T1, T2>, T1, T2> T install(ProcessorFactory<T, T1, T2> factory) {
 		return install(nextPriority(), factory);
 	}
 
@@ -212,7 +212,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param factory  the factory
 	 * @return the t
 	 */
-	public <T extends NetPipeline<T1, T2>, T1, T2> T installPipeline(int priority, PipelineFactory<T, T1, T2> factory) {
+	public <T extends Pipeline<T1, T2>, T1, T2> T installPipeline(int priority, PipelineFactory<T, T1, T2> factory) {
 		T newPipeline = factory.newInstance(priority);
 
 		pipelineList.add(newPipeline);
@@ -230,7 +230,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param factory the factory
 	 * @return the t
 	 */
-	public <T extends NetPipeline<T1, T2>, T1, T2> T installPipeline(PipelineFactory<T, T1, T2> factory) {
+	public <T extends Pipeline<T1, T2>, T1, T2> T installPipeline(PipelineFactory<T, T1, T2> factory) {
 		return installPipeline(nextPriority(), factory);
 	}
 
@@ -242,7 +242,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param newProcessor the new processor
 	 * @return the t
 	 */
-	private <T extends NetProcessor<?, ?, ?>> T installProcessor0(int priority, T newProcessor) {
+	private <T extends Processor<?, ?, ?>> T installProcessor0(int priority, T newProcessor) {
 		processorList.add(newProcessor);
 
 		if (highestPriority < priority)
@@ -267,7 +267,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override
-	public Iterator<NetProcessor<?, ?, ?>> iterator() {
+	public Iterator<Processor<?, ?, ?>> iterator() {
 		return processorList.iterator();
 	}
 
@@ -290,7 +290,7 @@ public class NetPipeline<T_IN, T_OUT>
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onLink(ProcessorLink<T_IN> link) {
@@ -298,7 +298,7 @@ public class NetPipeline<T_IN, T_OUT>
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onUnlink(ProcessorLink<T_IN> link) {
@@ -308,10 +308,10 @@ public class NetPipeline<T_IN, T_OUT>
 	 * Sets the up.
 	 *
 	 * @param context the new up
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#setup(com.slytechs.jnet.jnetruntime.pipeline.NetProcessor.NetProcessorContext)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#setup(com.slytechs.jnet.jnetruntime.pipeline.Processor.ProcessorContext)
 	 */
 	@Override
-	public void setup(NetProcessorContext context) {
+	public void setup(ProcessorContext context) {
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
@@ -329,8 +329,8 @@ public class NetPipeline<T_IN, T_OUT>
 	 *
 	 * @return the stream
 	 */
-	public Stream<NetProcessor<?, ?, ?>> stream() {
-		Iterator<NetProcessor<?, ?, ?>> it = iterator();
+	public Stream<Processor<?, ?, ?>> stream() {
+		Iterator<Processor<?, ?, ?>> it = iterator();
 
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false);
 	}
@@ -341,7 +341,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param type the type
 	 * @return the stream
 	 */
-	public Stream<NetProcessor<?, ?, ?>> stream(DataType type) {
+	public Stream<Processor<?, ?, ?>> stream(DataType type) {
 		return stream().filter(p -> p.inputType().equals(type));
 	}
 
@@ -351,7 +351,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 * @param processor the processor
 	 * @return the net pipeline
 	 */
-	public NetPipeline<T_IN, T_OUT> uninstall(NetProcessor<?, ?, ?> processor) {
+	public Pipeline<T_IN, T_OUT> uninstall(Processor<?, ?, ?> processor) {
 		processorList.remove(processor);
 
 		return this;
@@ -362,7 +362,7 @@ public class NetPipeline<T_IN, T_OUT>
 	 *
 	 * @return the net pipeline
 	 */
-	public NetPipeline<T_IN, T_OUT> uninstallAll() {
+	public Pipeline<T_IN, T_OUT> uninstallAll() {
 		checkNotBuiltStatus();
 
 		processorList.clear();

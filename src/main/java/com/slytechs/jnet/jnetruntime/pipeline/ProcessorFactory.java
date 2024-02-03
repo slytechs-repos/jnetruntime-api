@@ -21,9 +21,9 @@ package com.slytechs.jnet.jnetruntime.pipeline;
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
  */
-public interface ProcessorFactory<T extends NetProcessor<T, T_IN, T_OUT>, T_IN, T_OUT> {
+public interface ProcessorFactory<T extends Processor<T, T_IN, T_OUT>, T_IN, T_OUT> {
 
-	public interface PipelineFactory<T extends NetPipeline<?, ?>, T_IN, T_OUT> {
+	public interface PipelineFactory<T extends Pipeline<?, ?>, T_IN, T_OUT> {
 		T newInstance(int priority);
 	}
 

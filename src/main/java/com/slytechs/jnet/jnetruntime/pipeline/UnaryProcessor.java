@@ -25,7 +25,7 @@ import java.util.List;
  * @author repos@slytechs.com
  *
  */
-public abstract class UnaryProcessor<T_US extends UnaryProcessor<T_US, T>, T> extends NetProcessor<T_US, T, T> {
+public abstract class UnaryProcessor<T_US extends UnaryProcessor<T_US, T>, T> extends Processor<T_US, T, T> {
 
 	private final List<ProcessorLink<T>> links = new ArrayList<>();
 
@@ -38,7 +38,7 @@ public abstract class UnaryProcessor<T_US extends UnaryProcessor<T_US, T>, T> ex
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onLink(ProcessorLink<T> link) {
@@ -46,7 +46,7 @@ public abstract class UnaryProcessor<T_US extends UnaryProcessor<T_US, T>, T> ex
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
 	 */
 	@Override
 	public void onUnlink(ProcessorLink<T> link) {
@@ -54,7 +54,7 @@ public abstract class UnaryProcessor<T_US extends UnaryProcessor<T_US, T>, T> ex
 	}
 
 	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#enable(boolean)
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#enable(boolean)
 	 */
 	@Override
 	public T_US enable(boolean b) {

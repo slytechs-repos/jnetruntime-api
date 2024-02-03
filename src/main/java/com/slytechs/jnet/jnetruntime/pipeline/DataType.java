@@ -90,7 +90,7 @@ public interface DataType {
 		 */
 		@Override
 		public boolean isCompatibleWith(Object sink) {
-			if (sink instanceof NetProcessor<?, ?, ?> p)
+			if (sink instanceof Processor<?, ?, ?> p)
 				return dataInterface.isInstance(p.input());
 
 			return dataInterface.isInstance(sink);
@@ -105,10 +105,10 @@ public interface DataType {
 		}
 
 		/**
-		 * @see com.slytechs.jnet.jnetruntime.pipeline.DataType#isCompatibleWithProcessor(com.slytechs.jnet.jnetruntime.pipeline.NetProcessor)
+		 * @see com.slytechs.jnet.jnetruntime.pipeline.DataType#isCompatibleWithProcessor(com.slytechs.jnet.jnetruntime.pipeline.Processor)
 		 */
 		@Override
-		public boolean isCompatibleWithProcessor(NetProcessor<?, ?, ?> processor) {
+		public boolean isCompatibleWithProcessor(Processor<?, ?, ?> processor) {
 			return dataInterface.isInstance(processor.input());
 		}
 
@@ -151,7 +151,7 @@ public interface DataType {
 		return dataSupport().isCompatibleWithClass(sink);
 	}
 
-	default boolean isCompatibleWithProcessor(NetProcessor<?, ?, ?> processor) {
+	default boolean isCompatibleWithProcessor(Processor<?, ?, ?> processor) {
 		return dataSupport().isCompatibleWithProcessor(processor);
 	}
 
