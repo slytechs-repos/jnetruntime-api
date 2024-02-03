@@ -18,25 +18,11 @@
 package com.slytechs.jnet.jnetruntime.pipeline;
 
 /**
- * Processor group classifier, so that processors can be grouped by their class
- * type and arranged in priority order within.
- * 
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
+ *
  */
-public interface GroupType {
+public interface ProcessorLink<T> {
 
-	String name();
-
-	default int id() {
-
-		/*
-		 * This is mostly implemented by enums, and if we are one, we default to ordinal
-		 * index
-		 */
-		if (this instanceof Enum<?> e)
-			return e.ordinal();
-
-		return 0;
-	}
+	void relinkProcessor(T newInput);
 }

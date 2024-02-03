@@ -15,17 +15,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.slytechs.jnet.jnetruntime.pipeline;
+package com.slytechs.jnet.jnetruntime.util;
 
 /**
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
  *
  */
-public enum NetProcessorType implements GroupType {
+public interface Registration extends AutoCloseable {
 
-	TX_PCAP_RAW,
-	RX_PCAP_RAW,
-	RX_PACKET,
+	void unregister();
 
+	/**
+	 * @return
+	 */
+	static Registration empty() {
+		return () -> {};
+	}
+	
+	@Override
+	default void close() {
+		unregister();
+	}
 }

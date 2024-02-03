@@ -16,66 +16,85 @@
 package com.slytechs.jnet.jnetruntime.pipeline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import com.slytechs.jnet.jnetruntime.pipeline.ProcessorFactory.GroupFactory;
+import com.slytechs.jnet.jnetruntime.pipeline.ProcessorFactory.PipelineFactory;
 
 /**
  * The Class NetPipeline.
  *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
+ * @param <T_IN>  the generic type
+ * @param <T_OUT> the generic type
  */
-public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Iterable<NetProcessor<?>> {
+public class NetPipeline<T_IN, T_OUT>
+		extends NetProcessor<NetPipeline<T_IN, T_OUT>, T_IN, T_OUT>
+		implements AutoCloseable, Iterable<NetProcessor<?, ?, ?>> {
 
-	public NetPipeline(NetProcessorType type) {
-		super(type);
-	}
-
-	NetPipeline(NetProcessorGroup parent, NetProcessorType type) {
-		super(parent, type);
-	}
+	/** The pipeline list. */
+	private final List<NetPipeline<?, ?>> pipelineList = new ArrayList<>();
 
 	/** The groups. */
-	private List<NetProcessorGroup> groupList = new ArrayList<>();
+	private final List<ProcessorGroup<?, ?, ?>> groupList = new ArrayList<>();
 
 	/** The all processors. */
-	private final List<NetProcessor<?>> allProcessors = new ArrayList<>();
+	private final List<NetProcessor<?, ?, ?>> processorList = new ArrayList<>();
+
+	/** The closed. */
+	private boolean closed;
+
+	/** The context. */
+	private final NetProcessorContext context;
+
+	/** The highest priority. */
+	private int highestPriority = 0;
+
+	/**
+	 * Instantiates a new net pipeline.
+	 *
+	 * @param priority   the priority
+	 * @param inputType  the input type
+	 * @param outputType the output type
+	 */
+	protected NetPipeline(int priority, DataType inputType, DataType outputType) {
+		super(priority, inputType, outputType);
+		this.context = new NetProcessorContext();
+	}
 
 	/**
 	 * Builds the.
-	 *
-	 * @throws Exception the exception
 	 */
 	private void build() {
 		checkNotBuiltStatus();
-		
-		Collections.sort(groupList);
-		
-		groupList.forEach(NetProcessorGroup::linkGroup);
-		groupList.forEach(NetProcessorGroup::setup);
 
+		Collections.sort(groupList);
+
+		groupList.forEach(this::setupGroup);
+		groupList.forEach(this::linkGroup);
+
+		closed = true;
 	}
 
 	/**
 	 * Check not built.
 	 */
 	private void checkNotBuiltStatus() {
-		if (!groupList.isEmpty())
+		if (closed)
 			throw new IllegalStateException("pipeline already built");
 	}
 
 	/**
 	 * Close.
 	 *
-	 * @throws Exception the exception
 	 * @see java.lang.AutoCloseable#close()
 	 */
 	@Override
@@ -84,12 +103,21 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	}
 
 	/**
+	 * Context.
+	 *
+	 * @return the net processor context
+	 */
+	public final NetProcessorContext context() {
+		return context;
+	}
+
+	/**
 	 * Enable all.
 	 *
 	 * @param b the b
 	 * @return the net pipeline
 	 */
-	public NetPipeline enableAll(boolean b) {
+	public NetPipeline<T_IN, T_OUT> enableAll(boolean b) {
 		checkNotBuiltStatus();
 
 		return enableAll(() -> b);
@@ -101,7 +129,7 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * @param b the b
 	 * @return the net pipeline
 	 */
-	public NetPipeline enableAll(BooleanSupplier b) {
+	public NetPipeline<T_IN, T_OUT> enableAll(BooleanSupplier b) {
 		checkNotBuiltStatus();
 
 		for (var p : this)
@@ -114,29 +142,122 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * Install.
 	 *
 	 * @param <T>      the generic type
+	 * @param <T1>     the generic type
+	 * @param <T2>     the generic type
 	 * @param priority the priority
 	 * @param factory  the factory
 	 * @return the t
 	 */
-	public <T extends NetProcessor<T>> T install(int priority, NetProcessorFactory<T> factory) {
+	public <T extends NetProcessor<T, T1, T2>, T1, T2> T install(int priority, ProcessorFactory<T, T1, T2> factory) {
 		checkNotBuiltStatus();
 
-		T processor = factory.newInstance(this, priority);
+		T processor = factory.newInstance(priority);
 
-		allProcessors.add(processor);
-
-		return processor;
+		return installProcessor0(priority, processor);
 	}
 
 	/**
 	 * Install.
 	 *
 	 * @param <T>     the generic type
+	 * @param <T1>    the generic type
+	 * @param <T2>    the generic type
 	 * @param factory the factory
 	 * @return the t
 	 */
-	public <T extends NetProcessor<T>> T install(NetProcessorFactory<T> factory) {
+	public <T extends NetProcessor<T, T1, T2>, T1, T2> T install(ProcessorFactory<T, T1, T2> factory) {
 		return install(nextPriority(), factory);
+	}
+
+	/**
+	 * Install group.
+	 *
+	 * @param <T>     the generic type
+	 * @param <T1>    the generic type
+	 * @param <T2>    the generic type
+	 * @param factory the factory
+	 * @return the t
+	 */
+	protected <T extends ProcessorGroup<T, T1, T2>, T1, T2> T installGroup(GroupFactory<T, T1, T2> factory) {
+		return installGroup(nextPriority(), factory);
+	}
+
+	/**
+	 * Install pipeline.
+	 *
+	 * @param <T>      the generic type
+	 * @param <T1>     the generic type
+	 * @param <T2>     the generic type
+	 * @param priority the priority
+	 * @param factory  the factory
+	 * @return the t
+	 */
+	protected <T extends ProcessorGroup<T, T1, T2>, T1, T2> T installGroup(int priority,
+			GroupFactory<T, T1, T2> factory) {
+		T newGroup = factory.newInstance(priority);
+
+		groupList.add(newGroup);
+		Collections.sort(groupList);
+
+		return newGroup;
+	}
+
+	/**
+	 * Install pipeline.
+	 *
+	 * @param <T>      the generic type
+	 * @param <T1>     the generic type
+	 * @param <T2>     the generic type
+	 * @param priority the priority
+	 * @param factory  the factory
+	 * @return the t
+	 */
+	public <T extends NetPipeline<T1, T2>, T1, T2> T installPipeline(int priority, PipelineFactory<T, T1, T2> factory) {
+		T newPipeline = factory.newInstance(priority);
+
+		pipelineList.add(newPipeline);
+		Collections.sort(pipelineList);
+
+		return installProcessor0(priority, newPipeline);
+	}
+
+	/**
+	 * Install pipeline.
+	 *
+	 * @param <T>     the generic type
+	 * @param <T1>    the generic type
+	 * @param <T2>    the generic type
+	 * @param factory the factory
+	 * @return the t
+	 */
+	public <T extends NetPipeline<T1, T2>, T1, T2> T installPipeline(PipelineFactory<T, T1, T2> factory) {
+		return installPipeline(nextPriority(), factory);
+	}
+
+	/**
+	 * Install processor 0.
+	 *
+	 * @param <T>          the generic type
+	 * @param priority     the priority
+	 * @param newProcessor the new processor
+	 * @return the t
+	 */
+	private <T extends NetProcessor<?, ?, ?>> T installProcessor0(int priority, T newProcessor) {
+		processorList.add(newProcessor);
+
+		if (highestPriority < priority)
+			highestPriority = priority;
+
+		return newProcessor;
+	}
+
+	/**
+	 * Checks if is open.
+	 *
+	 * @return true, if is open
+	 */
+	public boolean isOpen() {
+		return !closed;
 	}
 
 	/**
@@ -146,8 +267,17 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override
-	public Iterator<NetProcessor<?>> iterator() {
-		return allProcessors.iterator();
+	public Iterator<NetProcessor<?, ?, ?>> iterator() {
+		return processorList.iterator();
+	}
+
+	/**
+	 * Link group.
+	 *
+	 * @param group the group
+	 */
+	private void linkGroup(ProcessorGroup<?, ?, ?> group) {
+
 	}
 
 	/**
@@ -156,7 +286,42 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * @return the int
 	 */
 	private int nextPriority() {
+		return highestPriority + 10;
+	}
+
+	/**
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 */
+	@Override
+	public void onLink(ProcessorLink<T_IN> link) {
+		// Nothing to do
+	}
+
+	/**
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
+	 */
+	@Override
+	public void onUnlink(ProcessorLink<T_IN> link) {
+	}
+
+	/**
+	 * Sets the up.
+	 *
+	 * @param context the new up
+	 * @see com.slytechs.jnet.jnetruntime.pipeline.NetProcessor#setup(com.slytechs.jnet.jnetruntime.pipeline.NetProcessor.NetProcessorContext)
+	 */
+	@Override
+	public void setup(NetProcessorContext context) {
 		throw new UnsupportedOperationException("not implemented yet");
+	}
+
+	/**
+	 * Setup group.
+	 *
+	 * @param group the group
+	 */
+	private void setupGroup(ProcessorGroup<?, ?, ?> group) {
+
 	}
 
 	/**
@@ -164,8 +329,8 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 *
 	 * @return the stream
 	 */
-	public Stream<NetProcessor<?>> stream() {
-		Iterator<NetProcessor<?>> it = iterator();
+	public Stream<NetProcessor<?, ?, ?>> stream() {
+		Iterator<NetProcessor<?, ?, ?>> it = iterator();
 
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false);
 	}
@@ -176,8 +341,8 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * @param type the type
 	 * @return the stream
 	 */
-	public Stream<NetProcessor<?>> stream(GroupType type) {
-		return stream().filter(p -> p.type().equals(type));
+	public Stream<NetProcessor<?, ?, ?>> stream(DataType type) {
+		return stream().filter(p -> p.inputType().equals(type));
 	}
 
 	/**
@@ -186,8 +351,8 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 * @param processor the processor
 	 * @return the net pipeline
 	 */
-	public NetPipeline uninstall(NetProcessor<?> processor) {
-		allProcessors.remove(processor);
+	public NetPipeline<T_IN, T_OUT> uninstall(NetProcessor<?, ?, ?> processor) {
+		processorList.remove(processor);
 
 		return this;
 	}
@@ -197,30 +362,11 @@ public class NetPipeline extends NetProcessorGroup implements AutoCloseable, Ite
 	 *
 	 * @return the net pipeline
 	 */
-	public NetPipeline uninstallAll() {
+	public NetPipeline<T_IN, T_OUT> uninstallAll() {
 		checkNotBuiltStatus();
 
-		allProcessors.clear();
+		processorList.clear();
 
 		return this;
 	}
-
-	@Override
-	public NetPipeline pipeline() {
-		return this;
-	}
-
-	@Override
-	NetProcessorGroup resolveByType(NetProcessorType type) {
-		return groupList.stream()
-				.filter(g -> g.type() == type)
-				.findAny()
-				.orElseGet(() -> {
-					var g = new NetProcessorGroup(this, type);
-
-					groupList.add(g);
-					return g;
-				});
-	}
-
 }

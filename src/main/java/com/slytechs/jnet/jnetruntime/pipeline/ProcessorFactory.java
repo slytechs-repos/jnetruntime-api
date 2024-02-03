@@ -20,10 +20,17 @@ package com.slytechs.jnet.jnetruntime.pipeline;
 /**
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
- *
  */
-public interface NetProcessorFactory<T extends NetProcessor<T>> {
+public interface ProcessorFactory<T extends NetProcessor<T, T_IN, T_OUT>, T_IN, T_OUT> {
 
-	T newInstance(NetProcessorGroup group, int priority);
-	
+	public interface PipelineFactory<T extends NetPipeline<?, ?>, T_IN, T_OUT> {
+		T newInstance(int priority);
+	}
+
+	public interface GroupFactory<T extends ProcessorGroup<T, T_IN, T_OUT>, T_IN, T_OUT> {
+		T newInstance(int priority);
+	}
+
+	T newInstance(int priority);
+
 }
