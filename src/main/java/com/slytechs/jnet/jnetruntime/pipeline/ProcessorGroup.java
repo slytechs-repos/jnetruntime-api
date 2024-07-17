@@ -22,73 +22,97 @@ import java.util.List;
 import com.slytechs.jnet.jnetruntime.util.Registration;
 
 /**
- * The Class Group.
+ * Represents a group of processors in a data processing pipeline. This class
+ * manages a collection of UnaryProcessors that operate on the same data type,
+ * allowing for sequential processing within the group.
  *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
+ * @param <T_IN>  The input type for the processor group
+ * @param <T_OUT> The output type for the processor group
  */
-public class ProcessorGroup<T_US extends Processor<T_US, T_IN, T_OUT>, T_IN, T_OUT> extends
-		Processor<T_US, T_IN, T_OUT> {
+public class ProcessorGroup<T_IN, T_OUT> extends Processor<T_IN, T_OUT> {
 
-	/** The processors. */
-	private final List<UnaryProcessor<?, T_OUT>> processors = new ArrayList<>();
+	/** The list of UnaryProcessors in this group. */
+	private final List<UnaryProcessor<T_OUT>> processors = new ArrayList<>();
+
+	/** The main processor for this group. */
+	private final Processor<T_IN, T_OUT> mainProcessor;
 
 	/**
-	 * New root group.
+	 * Constructs a new ProcessorGroup with a specified group processor.
 	 *
-	 * @param pipeline   the pipeline
-	 * @param outputType the type
+	 * @param <T>            The type of the group processor
+	 * @param priority       The priority of this processor group
+	 * @param groupProcessor The main processor for this group
+	 * @param inputType      The input data type for this group
+	 * @param outputType     The output data type for this group
 	 */
-	public ProcessorGroup(int priority, DataType outputType, DataType inputType) {
-		super(priority, inputType, outputType);
+	protected <T extends Processor<T_IN, T_OUT>> ProcessorGroup(int priority, T groupProcessor, DataType inputType,
+			DataType outputType) {
+		super(priority, groupProcessor.input(), inputType, outputType);
+		this.mainProcessor = groupProcessor;
 	}
 
 	/**
-	 * Dispose.
+	 * Constructs a new ProcessorGroup without a specific group processor.
 	 *
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#destroy()
+	 * @param priority   The priority of this processor group
+	 * @param inputType  The input data type for this group
+	 * @param outputType The output data type for this group
+	 */
+	protected ProcessorGroup(int priority, DataType inputType, DataType outputType) {
+		super(priority, inputType, outputType);
+		this.mainProcessor = this;
+	}
+
+	/**
+	 * Returns the main group processor.
+	 *
+	 * @param <T> The type of the group processor
+	 * @return The main group processor
+	 */
+	@SuppressWarnings("unchecked")
+	protected final <T extends Processor<T_IN, T_OUT>> T groupProcessor() {
+		return (T) this.mainProcessor;
+	}
+
+	/**
+	 * Disposes of this processor group and all its members.
 	 */
 	@Override
-	public void destroy() {
+	protected void destroy() {
 		super.destroy();
-
 		processors.forEach(Processor::destroy);
 		Collections.fill(processors, null); // Destroy
 		processors.clear();
 	}
 
 	/**
-	 * Checks if is empty.
+	 * Checks if this processor group is empty.
 	 *
-	 * @return true, if is empty
+	 * @return true if the group contains no processors, false otherwise
 	 */
 	public boolean isEmpty() {
 		return processors.isEmpty();
 	}
 
 	/**
-	 * Processors.
+	 * Returns an array of all processors in this group.
 	 *
-	 * @return the net processor[]
+	 * @return An array of Processor objects
 	 */
-	public Processor<?, ?, ?>[] processors() {
+	public Processor<?, ?>[] members() {
 		return this.processors.toArray(Processor[]::new);
 	}
 
 	/**
-	 * Add to the last processor in this group, output
-	 * 
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#addOutput(java.lang.Object)
+	 * Links all processors in this group sequentially. This method connects the
+	 * output of each processor to the input of the next processor in the group.
+	 *
+	 * @return A Registration object that can be used to unregister all the links
 	 */
-	@Override
-	public Registration addOutput(T_OUT out) {
-		if (processors.isEmpty())
-			return super.addOutput(out);
-
-		return processors.getLast().addOutput(out);
-	}
-
-	Registration linkGroup() {
+	Registration linkGroupProcessors() {
 		if (isEmpty())
 			return Registration.empty();
 
@@ -99,35 +123,12 @@ public class ProcessorGroup<T_US extends Processor<T_US, T_IN, T_OUT>, T_IN, T_O
 		list.add(reg);
 
 		for (int i = 0; i < processors.size() - 1; i++) {
-			Processor<?, T_OUT, T_OUT> prev = processors.get(i + 0);
-			Processor<?, T_OUT, T_OUT> next = processors.get(i + 1);
-
+			Processor<T_OUT, T_OUT> prev = processors.get(i + 0);
+			Processor<T_OUT, T_OUT> next = processors.get(i + 1);
 			reg = prev.addOutput(next.input(), next);
 			list.add(reg);
 		}
 
 		return () -> list.forEach(Registration::unregister);
-	}
-
-	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#setup(com.slytechs.jnet.jnetruntime.pipeline.Processor.ProcessorContext)
-	 */
-	@Override
-	public void setup(ProcessorContext context) {
-		throw new UnsupportedOperationException("not implemented yet");
-	}
-
-	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onLink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
-	 */
-	@Override
-	public void onLink(ProcessorLink<T_IN> link) {
-	}
-
-	/**
-	 * @see com.slytechs.jnet.jnetruntime.pipeline.Processor#onUnlink(com.slytechs.jnet.jnetruntime.pipeline.ProcessorLink)
-	 */
-	@Override
-	public void onUnlink(ProcessorLink<T_IN> link) {
 	}
 }

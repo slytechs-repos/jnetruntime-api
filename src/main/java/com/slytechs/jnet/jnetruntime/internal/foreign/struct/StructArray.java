@@ -126,7 +126,7 @@ public final class StructArray<T> extends StructMember {
 	 * @return the utf 8 string
 	 */
 	public String getUtf8String(MemorySegment segment) {
-		return segment.getUtf8String(byteOffset());
+		return segment.getString(byteOffset());
 	}
 
 	/**

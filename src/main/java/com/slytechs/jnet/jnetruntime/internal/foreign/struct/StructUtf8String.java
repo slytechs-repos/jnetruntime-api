@@ -20,7 +20,7 @@ package com.slytechs.jnet.jnetruntime.internal.foreign.struct;
 import java.lang.foreign.MemorySegment;
 import java.util.function.BiFunction;
 
-import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.*;
 
 /**
  * The Class StructUtf8String.
@@ -39,7 +39,7 @@ public final class StructUtf8String extends StructMember {
 	 * @return the string
 	 */
 	public static String readByteSequence(MemorySegment segment, long byteOffset) {
-		return segment.getUtf8String(byteOffset);
+		return segment.getString(byteOffset);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public final class StructUtf8String extends StructMember {
 	 */
 	public static String readUtf8StringPointer(MemorySegment segment, long byteOffset) {
 		return segment.get(ADDRESS, byteOffset)
-				.getUtf8String(0);
+				.getString(0);
 	}
 
 	/** The native accessor. */

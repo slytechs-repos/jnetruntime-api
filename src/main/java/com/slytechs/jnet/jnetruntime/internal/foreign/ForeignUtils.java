@@ -70,7 +70,7 @@ public final class ForeignUtils {
 		if (addr.byteSize() == 0)
 			addr = addr.reinterpret(DEFAULT_MAX_STRING_LEN);
 
-		String str = addr.getUtf8String(0);
+		String str = addr.getString(0);
 		return str;
 	}
 

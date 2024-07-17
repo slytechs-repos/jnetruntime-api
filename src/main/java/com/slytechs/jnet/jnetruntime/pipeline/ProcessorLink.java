@@ -1,7 +1,7 @@
 /*
  * Sly Technologies Free License
  * 
- * Copyright 2023 Sly Technologies Inc.
+ * Copyright 2024 Sly Technologies Inc.
  *
  * Licensed under the Sly Technologies Free License (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,11 +18,39 @@
 package com.slytechs.jnet.jnetruntime.pipeline;
 
 /**
+ * Represents a link between processors in a data processing pipeline. This
+ * interface provides a mechanism for dynamically reconnecting processors,
+ * allowing for flexible reconfiguration of the pipeline structure at runtime.
+ *
+ * <p>
+ * The ProcessorLink is typically used internally by the pipeline framework to
+ * manage connections between processors, enabling operations such as processor
+ * bypassing, replacement, or dynamic pipeline restructuring.
+ * </p>
+ *
+ * @param <T> The type of data flowing through this link
+ *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
- *
  */
 public interface ProcessorLink<T> {
 
+	/**
+	 * Relinks the processor associated with this link to a new input source.
+	 * 
+	 * <p>
+	 * This method is used to dynamically change the input of a processor,
+	 * effectively rewiring the pipeline. It can be used for various purposes such
+	 * as:
+	 * <ul>
+	 * <li>Bypassing a processor by linking its predecessor directly to its
+	 * successor</li>
+	 * <li>Inserting a new processor into the pipeline</li>
+	 * <li>Changing the data flow path in response to runtime conditions</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param newInput The new input source to which the processor should be linked
+	 */
 	void relinkProcessor(T newInput);
 }
