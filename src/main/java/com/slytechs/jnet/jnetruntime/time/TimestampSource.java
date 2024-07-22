@@ -1,7 +1,7 @@
 /*
  * Sly Technologies Free License
  * 
- * Copyright 2023 Sly Technologies Inc.
+ * Copyright 2024 Sly Technologies Inc.
  *
  * Licensed under the Sly Technologies Free License (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -32,7 +32,16 @@ import java.util.concurrent.TimeoutException;
  */
 public interface TimestampSource extends InstantSource {
 
+	/**
+	 * The Interface AssignableTimestampSource.
+	 */
 	public interface AssignableTimestampSource extends TimestampSource {
+
+		/**
+		 * Timestamp.
+		 *
+		 * @param newTimestamp the new timestamp
+		 */
 		void timestamp(long newTimestamp);
 	}
 
@@ -66,6 +75,11 @@ public interface TimestampSource extends InstantSource {
 		};
 	}
 
+	/**
+	 * Assignable.
+	 *
+	 * @return the assignable timestamp source
+	 */
 	public static AssignableTimestampSource assignable() {
 		return new AssignableTimestampSource() {
 			final Exchanger<Long> exch = new Exchanger<>();;
@@ -116,10 +130,21 @@ public interface TimestampSource extends InstantSource {
 		};
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param initialTimestamp the initial timestamp
+	 */
 	default void init(long initialTimestamp) {
 
 	}
 
+	/**
+	 * Update.
+	 *
+	 * @param newTimestamp the new timestamp
+	 * @throws InterruptedException the interrupted exception
+	 */
 	default void update(long newTimestamp) throws InterruptedException {
 
 	}
@@ -149,6 +174,11 @@ public interface TimestampSource extends InstantSource {
 		return System.currentTimeMillis();
 	}
 
+	/**
+	 * Epoch nano.
+	 *
+	 * @return the long
+	 */
 	default long epochNano() {
 		long nano = nanoTime();
 		long millis = milliTime();
@@ -165,24 +195,52 @@ public interface TimestampSource extends InstantSource {
 		return TimestampUnit.EPOCH_NANO;
 	}
 
+	/**
+	 * Time unit.
+	 *
+	 * @return the time unit
+	 */
 	default TimeUnit timeUnit() {
 		return TimeUnit.NANOSECONDS;
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param duration the duration
+	 * @param unit     the unit
+	 * @throws InterruptedException the interrupted exception
+	 */
 	default void sleep(long duration, TimeUnit unit) throws InterruptedException {
 		unit.sleep(duration);
 	}
 
+	/**
+	 * Timer.
+	 *
+	 * @param duration the duration
+	 * @param unit     the unit
+	 * @param action   the action
+	 * @throws InterruptedException the interrupted exception
+	 */
 	default void timer(long duration, TimeUnit unit, Runnable action) throws InterruptedException {
 		sleep(duration, unit);
 
 		action.run();
 	}
 
+	/**
+	 * Checks if is realtime.
+	 *
+	 * @return true, if is realtime
+	 */
 	default boolean isRealtime() {
 		return false;
 	}
 
+	/**
+	 * Close.
+	 */
 	default void close() {
 	}
 }

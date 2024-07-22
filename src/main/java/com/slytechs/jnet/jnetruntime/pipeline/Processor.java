@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package com.slytechs.jnet.jnetruntime.pipeline;
+ */
+package com.slytechs.jnet.jnetruntime.pipeline;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,7 @@ import com.slytechs.jnet.jnetruntime.util.Registration;
  *
  * <p>
  * Example usage:
+ * </p>
  * 
  * <pre>
  * public class PacketProcessor extends Processor&lt;RawPacket, ParsedPacket&gt; {
@@ -43,7 +45,6 @@ import com.slytechs.jnet.jnetruntime.util.Registration;
  * 	// Implement processing logic
  * }
  * </pre>
- * </p>
  *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com

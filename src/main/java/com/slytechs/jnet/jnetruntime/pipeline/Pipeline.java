@@ -1,18 +1,21 @@
 /*
- * Copyright 2024 Sly Technologies Inc
+ * Sly Technologies Free License
+ * 
+ * Copyright 2024 Sly Technologies Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * Licensed under the Sly Technologies Free License (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.slytechs.com/free-license-text
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */package com.slytechs.jnet.jnetruntime.pipeline;
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package com.slytechs.jnet.jnetruntime.pipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,27 +37,23 @@ import com.slytechs.jnet.jnetruntime.util.Registration;
  * sub-pipelines. It provides methods for installing, configuring, and managing
  * these components.
  * 
- * <p>
  * This class is designed to be extensible, allowing for the creation of custom
  * processing pipelines for various data processing tasks.
- * </p>
  * 
- * <p>
  * Example usage:
  * 
  * <pre>
- * Pipeline<RawPacket, ParsedPacket> pipeline = new Pipeline<>(1, new PacketProcessor(), DataType.RAW, DataType.PARSED);
+ * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = new Pipeline&lt;&gt;(1, new PacketProcessor(), DataType.RAW, DataType.PARSED);
  * pipeline.install(new HeaderProcessor())
  * 		.install(new PayloadProcessor())
  * 		.build();
  * ParsedPacket result = pipeline.process(rawPacket);
  * </pre>
- * </p>
- * 
+ *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
- * @param <T_IN>  The input type for the pipeline
- * @param <T_OUT> The output type for the pipeline
+ * @param <T_IN>  the generic type
+ * @param <T_OUT> the generic type
  */
 public class Pipeline<T_IN, T_OUT>
 		extends Processor<T_IN, T_OUT>
@@ -113,12 +112,12 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
 	 * ProcessorGroup<RawPacket, ParsedPacket> mainGroup = new PacketProcessorGroup();
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = new Pipeline<>(1, mainGroup, DataType.RAW, DataType.PARSED);
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>        The type of the processor group
 	 * @param priority   The priority of this pipeline in a larger system
@@ -142,15 +141,15 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
 	 * PacketConsumer consumer = new PacketConsumer();
 	 * Registration reg = pipeline.addOutput(consumer);
 	 * // Later, when no longer needed:
 	 * reg.unregister();
 	 * </pre>
-	 * </p>
 	 *
 	 * @param out The output to add
 	 * @return A Registration object that can be used to unregister the output later
@@ -171,14 +170,16 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * PacketConsumer consumer = new PacketConsumer();
-	 * Processor<ParsedPacket, ParsedPacket> formatter = new PacketFormatter();
+	 * Processor&lt;ParsedPacket, ParsedPacket&gt; formatter = new PacketFormatter();
 	 * Registration reg = pipeline.addOutput(consumer, formatter);
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param out       The output to add
 	 * @param processor The processor to associate with the output
@@ -196,6 +197,7 @@ public class Pipeline<T_IN, T_OUT>
 	 * <p>
 	 * This method should be called after all processors have been installed and
 	 * before the pipeline is used for processing. It performs the following steps:
+	 * </p>
 	 * <ol>
 	 * <li>Checks if the pipeline is already built</li>
 	 * <li>Sorts the processor groups by priority</li>
@@ -203,19 +205,18 @@ public class Pipeline<T_IN, T_OUT>
 	 * <li>Links the processor groups together</li>
 	 * <li>Marks the pipeline as closed (built)</li>
 	 * </ol>
-	 * </p>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
 	 * pipeline.install(new HeaderProcessor())
 	 *         .install(new PayloadProcessor())
 	 *         .build();
 	 * // The pipeline is now ready for use
 	 * </pre>
-	 * </p>
 	 *
 	 * @throws IllegalStateException if the pipeline is already built
 	 */
@@ -277,14 +278,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
 	 * ProcessorContext context = pipeline.context();
 	 * // Use the context to retrieve or set pipeline-wide information
 	 * int maxPacketSize = context.getProperty("maxPacketSize", 1500);
 	 * </pre>
-	 * </p>
 	 *
 	 * @return The processor context associated with this pipeline
 	 */
@@ -303,16 +304,18 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * // Disable all processors
 	 * pipeline.enableAll(false);
 	 * // ... perform some other operations ...
 	 * // Re-enable all processors
 	 * pipeline.enableAll(true);
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param b A boolean value indicating whether to enable (true) or disable
 	 *          (false) all processors
@@ -337,15 +340,17 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * AtomicBoolean flag = new AtomicBoolean(true);
 	 * pipeline.enableAll(flag::get);
 	 * // Later, to disable all processors:
 	 * flag.set(false);
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param b A boolean supplier that determines whether processors should be
 	 *          enabled
@@ -371,14 +376,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
-	 * ParsedPacket result = pipeline.get(rawPacket -> {
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
+	 * ParsedPacket result = pipeline.get(rawPacket -&gt; {
 	 *     // Process raw packet
 	 * });
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>    The type of the result (same as the pipeline's output type)
 	 * @param source The source of input data
@@ -400,14 +405,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
-	 * HeaderInfo headerInfo = pipeline.get(DataType.HEADER, rawPacket -> {
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
+	 * HeaderInfo headerInfo = pipeline.get(DataType.HEADER, rawPacket -&gt; {
 	 *     // Process raw packet to extract header info
 	 * });
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>        The type of the result
 	 * @param resultType The data type of the result
@@ -429,16 +434,16 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
 	 * RawPacket input = pipeline.input();
 	 * // Inspect or modify the input
-	 * if (input.getSize() > MAX_SIZE) {
+	 * if (input.getSize() &gt; MAX_SIZE) {
 	 *     // Handle oversized packet
 	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @return The input of the pipeline
 	 */
@@ -457,12 +462,12 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
-	 * Processor<RawPacket, HeaderInfo> headerProcessor = pipeline.install(100, new HeaderProcessorFactory());
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
+	 * Processor&lt;RawPacket, HeaderInfo&gt; headerProcessor = pipeline.install(100, new HeaderProcessorFactory());
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>      The type of the processor
 	 * @param <T1>     The input type of the processor
@@ -490,12 +495,12 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
-	 * Processor<RawPacket, PayloadInfo> payloadProcessor = pipeline.install(new PayloadProcessorFactory());
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
+	 * Processor&lt;RawPacket, PayloadInfo&gt; payloadProcessor = pipeline.install(new PayloadProcessorFactory());
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>     The type of the processor
 	 * @param <T1>    The input type of the processor
@@ -518,13 +523,13 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
-	 * ProcessorGroup<RawPacket, HeaderInfo> headerGroup = new HeaderProcessorGroup();
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
+	 * ProcessorGroup&lt;RawPacket, HeaderInfo&gt; headerGroup = new HeaderProcessorGroup();
 	 * pipeline.installGroup(headerGroup);
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>      The type of the processor group
 	 * @param <T1>     The input type of the processor group
@@ -551,12 +556,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * Processor<RawPacket, HeaderInfo> headerProcessor = pipeline.installIfAbsent(100, new HeaderProcessorFactory());
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>      The type of the processor
 	 * @param <T1>     The input type of the processor
@@ -582,12 +589,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> mainPipeline = ...;
-	 * Pipeline<RawPacket, HeaderInfo> headerPipeline = mainPipeline.installPipeline(50, new HeaderPipelineFactory());
+	 * {@code
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; mainPipeline = ...;
+	 * Pipeline&lt;RawPacket, HeaderInfo&gt; headerPipeline = mainPipeline.installPipeline(50, new HeaderPipelineFactory());
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>      The type of the sub-pipeline
 	 * @param <T1>     The input type of the sub-pipeline
@@ -605,7 +614,7 @@ public class Pipeline<T_IN, T_OUT>
 
 		return installProcessor0(priority, newPipeline);
 	}
-	
+
 	/**
 	 * Installs a new sub-pipeline into this pipeline with the next available
 	 * priority.
@@ -618,12 +627,14 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> mainPipeline = ...;
-	 * Pipeline<RawPacket, PayloadInfo> payloadPipeline = mainPipeline.installPipeline(new PayloadPipelineFactory());
+	 * {@code
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; mainPipeline = ...;
+	 * Pipeline&lt;RawPacket, PayloadInfo&gt; payloadPipeline = mainPipeline.installPipeline(new PayloadPipelineFactory());
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param <T>     The type of the sub-pipeline
 	 * @param <T1>    The input type of the sub-pipeline
@@ -637,42 +648,51 @@ public class Pipeline<T_IN, T_OUT>
 	}
 
 	/**
-     * Internal method to install a processor into the pipeline.
-     * 
-     * <p>This private method is used by other installation methods to add a new processor
-     * to the pipeline. It updates the processor list and adjusts the highest priority
-     * if necessary.</p>
-     *
-     * <p>This method is not intended to be called directly by users of the Pipeline class.
-     * Instead, use the public installation methods like {@link #install(int, ProcessorFactory)}
-     * or {@link #installPipeline(int, PipelineFactory)}.</p>
-     *
-     * <p>Example of internal usage:
-     * <pre>
-     * private <T extends Processor<?, ?>> T installProcessor0(int priority, T newProcessor) {
-     *     processorList.add(newProcessor);
-     *
-     *     if (highestPriority < priority)
-     *         highestPriority = priority;
-     *
-     *     return newProcessor;
-     * }
-     * </pre>
-     * </p>
-     *
-     * @param <T> The type of the processor
-     * @param priority The priority of the processor
-     * @param newProcessor The new processor to install
-     * @return The installed processor
-     */
-    private <T extends Processor<?, ?>> T installProcessor0(int priority, T newProcessor) {
-        processorList.add(newProcessor);
+	 * Internal method to install a processor into the pipeline.
+	 * 
+	 * <p>
+	 * This private method is used by other installation methods to add a new
+	 * processor to the pipeline. It updates the processor list and adjusts the
+	 * highest priority if necessary.
+	 * </p>
+	 *
+	 * <p>
+	 * This method is not intended to be called directly by users of the Pipeline
+	 * class. Instead, use the public installation methods like
+	 * {@link #install(int, ProcessorFactory)} or
+	 * {@link #installPipeline(int, PipelineFactory)}.
+	 * </p>
+	 *
+	 * <p>
+	 * Example of internal usage:
+	 * </p>
+	 * 
+	 * <pre>
+	 * {@code
+	 * private &lt;T extends Processor&lt;?, ?&gt;&gt; T installProcessor0(int priority, T newProcessor) {
+	 * 	processorList.add(newProcessor);
+	 *
+	 * 	if (highestPriority &lt; priority)
+	 * 		highestPriority = priority;
+	 *
+	 * 	return newProcessor;
+	 * }
+	 * }
+	 * </pre>
+	 *
+	 * @param <T>          The type of the processor
+	 * @param priority     The priority of the processor
+	 * @param newProcessor The new processor to install
+	 * @return The installed processor
+	 */
+	private <T extends Processor<?, ?>> T installProcessor0(int priority, T newProcessor) {
+		processorList.add(newProcessor);
 
-        if (highestPriority < priority)
-            highestPriority = priority;
+		if (highestPriority < priority)
+			highestPriority = priority;
 
-        return newProcessor;
-    }
+		return newProcessor;
+	}
 
 	/**
 	 * Checks if the pipeline is open (not built).
@@ -684,16 +704,16 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
-	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
+	 * Pipeline&lt;RawPacket, ParsedPacket&gt; pipeline = ...;
 	 * if (pipeline.isOpen()) {
 	 *     pipeline.install(new HeaderProcessor());
 	 * } else {
 	 *     System.out.println("Pipeline is already built and cannot be modified.");
 	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @return true if the pipeline is open, false if it has been built
 	 */
@@ -711,14 +731,16 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * for (Processor<?, ?> processor : pipeline) {
 	 *     System.out.println("Processor: " + processor.getClass().getSimpleName());
 	 * }
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @return An iterator over the processors in this pipeline
 	 */
@@ -856,15 +878,17 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * long count = pipeline.stream()
 	 *                      .filter(p -> p instanceof HeaderProcessor)
 	 *                      .count();
 	 * System.out.println("Number of HeaderProcessors: " + count);
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @return A stream of processors in this pipeline
 	 */
@@ -884,13 +908,15 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * pipeline.stream(DataType.HEADER)
 	 *         .forEach(p -> System.out.println("Header processor: " + p.getClass().getSimpleName()));
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param type The data type to filter processors
 	 * @return A stream of processors of the specified type
@@ -909,13 +935,15 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * Processor<?, ?> processorToRemove = ...;
 	 * pipeline.uninstall(processorToRemove);
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param processor The processor to uninstall
 	 * @return This pipeline instance, allowing for method chaining
@@ -937,14 +965,16 @@ public class Pipeline<T_IN, T_OUT>
 	 *
 	 * <p>
 	 * Example:
+	 * </p>
 	 * 
 	 * <pre>
+	 * {@code
 	 * Pipeline<RawPacket, ParsedPacket> pipeline = ...;
 	 * if (pipeline.isOpen()) {
 	 *     pipeline.uninstallAll().install(new CustomProcessor());
 	 * }
+	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @return This pipeline instance, allowing for method chaining
 	 * @throws IllegalStateException if the pipeline is already built

@@ -1,7 +1,7 @@
 /*
  * Sly Technologies Free License
  * 
- * Copyright 2023 Sly Technologies Inc.
+ * Copyright 2024 Sly Technologies Inc.
  *
  * Licensed under the Sly Technologies Free License (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,18 +18,31 @@
 package com.slytechs.jnet.jnetruntime.util;
 
 /**
+ * The Interface IsIntFlag.
+ *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
- *
  */
 public interface IsIntFlag extends IsIntBitmask {
 
+	/**
+	 * Checks if is sets the.
+	 *
+	 * @param value the value
+	 * @return true, if is sets the
+	 */
 	default boolean isSet(int value) {
 		assert Integer.bitCount(getAsInt()) == 1 : "too many bits for a flag constants [%s]".formatted(toString());
 
 		return (getAsInt() & value) != 0;
 	}
 
+	/**
+	 * Checks if is clear.
+	 *
+	 * @param value the value
+	 * @return true, if is clear
+	 */
 	default boolean isClear(int value) {
 		assert Integer.bitCount(getAsInt()) == 1 : "too many bits for a flag constants [%s]".formatted(toString());
 

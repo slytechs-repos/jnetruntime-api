@@ -1,7 +1,7 @@
 /*
  * Sly Technologies Free License
  * 
- * Copyright 2023 Sly Technologies Inc.
+ * Copyright 2024 Sly Technologies Inc.
  *
  * Licensed under the Sly Technologies Free License (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -647,6 +647,13 @@ public class HexStrings {
 		return toDecStringPrefixed(array, 0, array.length, "" + DEFAULT_DEC_SEPARATOR, "", "");
 	}
 
+	/**
+	 * To ip 4 string.
+	 *
+	 * @param array  the array
+	 * @param offset the offset
+	 * @return the string
+	 */
 	public static String toIp4String(byte[] array, int offset) {
 		assert (array.length - offset) == 4;
 
@@ -683,6 +690,13 @@ public class HexStrings {
 		return toIp6StringCompressed(array, 0);
 	}
 
+	/**
+	 * To ip 6 string.
+	 *
+	 * @param array    the array
+	 * @param compress the compress
+	 * @return the string
+	 */
 	public static String toIp6String(byte[] array, boolean compress) {
 		assert array.length == 16;
 
@@ -691,6 +705,13 @@ public class HexStrings {
 				: toUncompressedIp6String(array, 0);
 	}
 
+	/**
+	 * To uncompressed ip 6 string.
+	 *
+	 * @param array  the array
+	 * @param offset the offset
+	 * @return the string
+	 */
 	public static String toUncompressedIp6String(byte[] array, int offset) {
 		assert (array.length - offset) >= 16;
 
@@ -712,6 +733,13 @@ public class HexStrings {
 		return toStringBuffer.toString();
 	}
 
+	/**
+	 * To ip 6 string compressed.
+	 *
+	 * @param array  the array
+	 * @param offset the offset
+	 * @return the string
+	 */
 	public static String toIp6StringCompressed(byte[] array, int offset) {
 		assert (array.length - offset) >= 16;
 

@@ -1,7 +1,7 @@
 /*
  * Sly Technologies Free License
  * 
- * Copyright 2023 Sly Technologies Inc.
+ * Copyright 2024 Sly Technologies Inc.
  *
  * Licensed under the Sly Technologies Free License (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -20,12 +20,16 @@ package com.slytechs.jnet.jnetruntime.util;
 import java.util.function.IntSupplier;
 
 /**
+ * The Interface IsIntBitmask.
+ *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com
- *
  */
 public interface IsIntBitmask extends IntSupplier {
 
+	/**
+	 * @see java.util.function.IntSupplier#getAsInt()
+	 */
 	@Override
 	int getAsInt();
 }

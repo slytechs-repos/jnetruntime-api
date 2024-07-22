@@ -33,6 +33,7 @@ import java.util.List;
  *
  * <p>
  * Example usage:
+ * </p>
  * 
  * <pre>
  * public class PacketFilter extends UnaryProcessor&lt;Packet&gt; {
@@ -43,7 +44,6 @@ import java.util.List;
  * 	// Implement processing logic
  * }
  * </pre>
- * </p>
  *
  * @author Sly Technologies Inc
  * @author repos@slytechs.com

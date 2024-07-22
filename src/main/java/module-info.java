@@ -16,7 +16,7 @@
  * the License.
  */
 /**
- * 
+ * Net modules runtime utilties and APIs 
  */
 module com.slytechs.jnet.jnetruntime {
 	exports com.slytechs.jnet.jnetruntime;
@@ -24,7 +24,7 @@ module com.slytechs.jnet.jnetruntime {
 	exports com.slytechs.jnet.jnetruntime.hash;
 	exports com.slytechs.jnet.jnetruntime.util;
 	exports com.slytechs.jnet.jnetruntime.pipeline;
-	
+
 	/* Private API */
 	exports com.slytechs.jnet.jnetruntime.internal;
 	exports com.slytechs.jnet.jnetruntime.internal.layout;
@@ -36,7 +36,7 @@ module com.slytechs.jnet.jnetruntime {
 	exports com.slytechs.jnet.jnetruntime.internal.util.function;
 	exports com.slytechs.jnet.jnetruntime.internal.util.collection;
 	exports com.slytechs.jnet.jnetruntime.internal.json;
-	
+
 	requires java.logging;
 
 }
