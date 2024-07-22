@@ -3,9 +3,10 @@
   <parent>
     <groupId>com.slytechs.jnet.jnetruntime</groupId>
     <artifactId>jnetruntime-sdk-parent</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
   </parent>
   <artifactId>jnetruntime-api</artifactId>
   <name>jNetRuntime API</name>
+  <version>0.3.0-SNAPSHOT</version>
   <description>Base runtime API and implementation classes</description>
 </project>
