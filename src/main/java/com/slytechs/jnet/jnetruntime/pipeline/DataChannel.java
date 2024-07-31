@@ -238,8 +238,8 @@ public final class DataChannel<T1, T2> {
 	 */
 	@SuppressWarnings("unchecked")
 	public T1 input() {
-		if (!isActive())
-			return null;
+//		if (!isActive())
+//			return null;
 
 		if (isEnabled) {
 			if (isDataSameType)

@@ -87,8 +87,8 @@ class TestSingleNodeDataChannel {
 		OUTPUT = null;
 	}
 
-	private DataChannel<Consumer<String>, Consumer<Integer>> node() {
-		var node = new DataChannel<Consumer<String>, Consumer<Integer>>("node", TestType.STRING, TestType.INTEGER,
+	private DataChannel<Consumer<String>, Consumer<Integer>> node(String name) {
+		var node = new DataChannel<Consumer<String>, Consumer<Integer>>(name, TestType.STRING, TestType.INTEGER,
 				INLINE);
 		node.updateListener(out -> OUTPUT = out);
 
@@ -114,7 +114,7 @@ class TestSingleNodeDataChannel {
 	@Test
 	void testIsActive() {
 
-		var dc = node();
+		var dc = node("node");
 		dc.sink(System.out::println);
 
 		assertTrue(dc.isActive(), "isActive");
@@ -128,7 +128,7 @@ class TestSingleNodeDataChannel {
 	@Test
 	void testIsActive_FALSE() {
 
-		var dc = node();
+		var dc = node("node");
 
 		assertFalse(dc.isActive(), "isActive");
 		assertNull(dc.input(), "input"); // Since no outputs
@@ -167,7 +167,7 @@ class TestSingleNodeDataChannel {
 	 */
 	@Test
 	void testInputType() {
-		var node = node();
+		var node = node("node");
 
 		assertEquals(TestType.STRING, node.inputType(), "inputType");
 	}
@@ -196,7 +196,7 @@ class TestSingleNodeDataChannel {
 	 */
 	@Test
 	void testOutput(TestInfo info) {
-		var node = node();
+		var node = node("node");
 
 		node.sink(System.out::println);
 
@@ -210,7 +210,7 @@ class TestSingleNodeDataChannel {
 	 */
 	@Test
 	void testOutputType() {
-		var node = node();
+		var node = node("node");
 
 		assertEquals(TestType.INTEGER, node.outputType(), "outputType");
 	}
@@ -221,15 +221,19 @@ class TestSingleNodeDataChannel {
 	 */
 	@Test
 	void testUpdateListener(TestInfo info) {
+		
+		final String node1Name = "node1";
+		final String node2Name = DataChannel.class.getSimpleName();
+		final String node3Name = "node3";
 
 		Consumer<Integer> NOOP = i -> {};
 
-		var n1 = node();
-		var n2 = new DataChannel<Consumer<Integer>, Consumer<Integer>>(DataChannel.class.getSimpleName(),
+		var n1 = node(node1Name);
+		var n2 = new DataChannel<Consumer<Integer>, Consumer<Integer>>(node2Name,
 				TestType.INTEGER,
 				TestType.INTEGER,
 				NOOP);
-		var n3 = new DataChannel<Consumer<Integer>, Consumer<Integer>>("node3",
+		var n3 = new DataChannel<Consumer<Integer>, Consumer<Integer>>(node3Name,
 				TestType.INTEGER,
 				TestType.INTEGER,
 				NOOP);
